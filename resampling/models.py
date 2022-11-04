@@ -1,0 +1,12 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import models
+import tempfile
+from django.core.files.base import File
+from django.db import models
+
+
+class Audio(models.Model):
+    audio_name = models.CharField(max_length=200)
+    audio_file = models.FileField(upload_to="audio")
