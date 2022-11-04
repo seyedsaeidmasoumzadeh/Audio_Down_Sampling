@@ -1,15 +1,10 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
+from rest_framework.exceptions import APIException
 from django.http import FileResponse
-from .serializers import UploadSerializer, DownloadSerializer
-from datetime import datetime
-from resampling.resampler import wave_down_sampling, mp3_down_sampling
-from scipy.io import wavfile
-import tempfile
-
-
-from django.http import HttpResponse
-from django.shortcuts import render
+from .serializers import UploadSerializer
+from resampling.resampler import down_sampling
+import os
 
 
 from io import BytesIO
@@ -23,17 +18,12 @@ class UploadViewSetAPI(ViewSet):
 
     def create(self, request):
         file_uploaded = request.FILES.get('file_uploaded')
-        
-        if ".wav" in file_uploaded.name:
-            new_signal = wave_down_sampling(BytesIO(file_uploaded.read()))
-
-        elif ".mp3" in file_uploaded.name:
-            new_signal = mp3_down_sampling(file_uploaded)    
-
+        _, format = os.path.splitext(file_uploaded.name)
+        if format not in ['.wav', '.mp3']:
+            raise APIException('format must be wav or mp3')
+        out_signal = down_sampling(file_uploaded)
+        if out_signal:
+            return FileResponse(BytesIO(out_signal))
         else:
-            Response({'message':'file must be wav or mp3','error':True,'code':500})    
+            raise APIException('sampling rate must be larger than 32kHz')   
 
-        with tempfile.SpooledTemporaryFile(max_size = 1024 * 1024 * 500, mode="wb+") as out_f:
-            wavfile.write(out_f, 32000, new_signal)
-            return FileResponse(BytesIO(out_f.read()))   
-          

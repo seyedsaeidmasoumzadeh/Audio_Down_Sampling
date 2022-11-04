@@ -10,6 +10,7 @@ docker build . -t docker-django-resampler
 
 ## API example
 ```python
+import requests
  file = {'file_uploaded': open('your-file.wav','rb')}
  r = requests.post(url, files=file)
  with open("resampled-file.wav", "wb") as f:

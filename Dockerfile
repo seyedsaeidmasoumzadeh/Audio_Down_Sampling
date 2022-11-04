@@ -12,8 +12,7 @@ WORKDIR $DockerHOME
 # set environment variables  
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-RUN apt-get update -y && apt-get install -y --no-install-recommends build-essential gcc \
-                                        libsndfile1 ffmpeg
+RUN apt-get update -y && apt-get install -y --no-install-recommends build-essential gcc libsndfile1 ffmpeg
 # install dependencies  
 RUN pip install --upgrade pip  
 
